@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>collection</title>
+<style>
+/* palette */
+:root {
+    --bg: #0f111a;
+    --surface: #1a1d2e;
+    --text: #e8e4d8;
+    --text-muted: #8a8a9a;
+    --accent: #7c9bff;
+    --accent-hover: #6b8aee;
+    --label-bg: #e8e4d8;
+    --label-text: #0f111a;
+    --ruler-line: rgba(100, 130, 220, 0.25);
+    --shadow: rgba(0, 0, 0, 0.6);
+    --shadow-light: rgba(0, 0, 0, 0.3);
+}
+
+/* layout */
+.collections-page {
+    min-height: 100vh;
+    background-color: var(--bg);
+    background-image: url('compnotebookbg.jpg');
+    /* replace bg */
+    background-repeat: repeat;
+    background-size: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* label */
+.comp-label {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    pointer-events: none;
+}
+
+.comp-label-inner {
+    background: var(--label-bg);
+    border: 2px solid var(--label-text);
+    padding: 10px 40px;
+    text-align: center;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.4),
+        inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    position: relative;
+}
+
+.comp-label-inner::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    top: 50%;
+    height: 0;
+    border-top: 1px solid var(--ruler-line);
+    border-bottom: 1px solid var(--ruler-line);
+    transform: translateY(-2px);
+    pointer-events: none;
+}
+
+.comp-label-title {
+    font-family: 'Courier New', 'Courier', monospace;
+    font-size: 4rem;
+    color: var(--label-text);
+    letter-spacing: 0.1em;
+    position: relative;
+    z-index: 1;
+}
+
+.comp-label-sub {
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--text-muted);
+    margin-top: 4px;
+    position: relative;
+    z-index: 1;
+}
+
+/* nav */
+.collections-nav {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 100;
+}
+
+.collections-nav .return-link {
+    font-family: 'Impact', 'Arial Black', sans-serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    text-decoration: none;
+    text-shadow: 0 1px 4px var(--shadow), 0 0 8px rgba(124, 155, 255, 0.3);
+    transition: color 0.3s, text-shadow 0.3s;
+}
+
+.collections-nav .return-link:hover {
+    color: var(--accent-hover);
+    text-shadow: 0 1px 4px var(--shadow), 0 0 12px rgba(107, 138, 238, 0.5);
+}
+
+/* surface */
+.sticker-surface {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    z-index: 1;
+    padding: 100px 20px 60px 20px;
+}
+
+/* items */
+.collection-item[src*="placeholder"] {
+    visibility: hidden;
+}
+
+.collection-item {
+    border: none;
+    outline: none;
+    background: none;
+    position: absolute;
+    display: block;
+    transition: transform 0.2s ease, z-index 0s;
+    image-rendering: auto;
+    filter: drop-shadow(1px 2px 3px rgba(0, 0, 0, 0.4));
+}
+
+.collection-item:hover {
+    z-index: 999 !important;
+    transform: var(--base-rotation) scale(1.3) !important;
+    filter: drop-shadow(2px 4px 8px var(--shadow));
+}
+
+.collection-item.item-stamp {
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+}
+
+.collection-item.item-sticker {
+    width: auto;
+    height: auto;
+}
+
+.collection-item.item-gif {
+    width: auto;
+    height: auto;
+}
+
+.collection-item.item-button {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.collection-item.item-blinkie {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.collection-item.item-userbox {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.collection-item.item-trinket {
+    /* variable size 70-160px */
+}
+</style>
+</head>
+<body class="collections-page">
+
+<!-- label -->
+<div class="comp-label">
+    <div class="comp-label-inner">
+        <div class="comp-label-title">collection</div>
+        <div class="comp-label-sub">stamps · stickers · pixels · gifs</div>
+        <!-- edit text -->
+    </div>
+</div>
+
+<nav class="collections-nav">
+    <a href="index.html" class="return-link">return</a>
+    <!-- edit -->
+</nav>
+
+<!-- surface -->
+<div class="sticker-surface" id="stickerSurface"></div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* items */
+    /* stamps, stickers, gifs, buttons, blinkies, userboxes, trinkets */
+    /* edit array entries to add your own images */
+    var stamps = [
+        { src: 'https://placehold.co/100x70/7c9bff/0f111a?text=stamp' },
+        { src: 'https://placehold.co/100x70/6b8aee/0f111a?text=stamp' },
+        { src: 'https://placehold.co/100x70/5a7add/0f111a?text=stamp' },
+        { src: 'https://placehold.co/100x70/496acc/0f111a?text=stamp' },
+        { src: 'https://placehold.co/100x70/385abb/0f111a?text=stamp' },
+        { src: 'https://placehold.co/100x70/7c9bff/0f111a?text=stamp' },
+        { src: 'https://placehold.co/100x70/6b8aee/0f111a?text=stamp' }
+    ];
+
+    var stickers = [
+        { src: 'https://placehold.co/100x100/7c9bff/e8e4d8?text=sticker' },
+        { src: 'https://placehold.co/120x120/6b8aee/e8e4d8?text=sticker' },
+        { src: 'https://placehold.co/80x80/5a7add/e8e4d8?text=sticker' },
+        { src: 'https://placehold.co/100x100/496acc/e8e4d8?text=sticker' },
+        { src: 'https://placehold.co/90x90/385abb/e8e4d8?text=sticker' },
+        { src: 'https://placehold.co/110x110/7c9bff/e8e4d8?text=sticker' }
+    ];
+
+    var gifs = [
+        { src: 'https://placehold.co/80x80/6b8aee/e8e4d8?text=gif' },
+        { src: 'https://placehold.co/90x90/5a7add/e8e4d8?text=gif' },
+        { src: 'https://placehold.co/70x70/496acc/e8e4d8?text=gif' },
+        { src: 'https://placehold.co/100x100/385abb/e8e4d8?text=gif' },
+        { src: 'https://placehold.co/80x80/7c9bff/e8e4d8?text=gif' }
+    ];
+
+    var buttons = [
+        { src: 'https://placehold.co/88x31/7c9bff/0f111a?text=button' },
+        { src: 'https://placehold.co/88x31/6b8aee/0f111a?text=button' },
+        { src: 'https://placehold.co/88x31/5a7add/0f111a?text=button' },
+        { src: 'https://placehold.co/88x31/496acc/0f111a?text=button' },
+        { src: 'https://placehold.co/88x31/385abb/0f111a?text=button' }
+    ];
+
+    var blinkies = [
+        { src: 'https://placehold.co/150x20/6b8aee/e8e4d8?text=blinkie' },
+        { src: 'https://placehold.co/150x20/5a7add/e8e4d8?text=blinkie' },
+        { src: 'https://placehold.co/150x20/496acc/e8e4d8?text=blinkie' },
+        { src: 'https://placehold.co/150x20/7c9bff/e8e4d8?text=blinkie' },
+        { src: 'https://placehold.co/150x20/385abb/e8e4d8?text=blinkie' }
+    ];
+
+    var userboxes = [
+        { src: 'https://placehold.co/300x100/7c9bff/0f111a?text=userbox' },
+        { src: 'https://placehold.co/300x100/6b8aee/0f111a?text=userbox' },
+        { src: 'https://placehold.co/300x100/5a7add/0f111a?text=userbox' }
+    ];
+
+    var trinkets = [
+        { src: 'https://placehold.co/150x150/496acc/e8e4d8?text=trinket' },
+        { src: 'https://placehold.co/120x120/385abb/e8e4d8?text=trinket' }
+    ];
+
+    /* configuration */
+    var STAMP_SIZE = 99;
+    var STAMP_HEIGHT = 56;
+    var STICKER_MIN = 60;
+    var STICKER_MAX = 140;
+    var GIF_MIN = 50;
+    var GIF_MAX = 120;
+    var ROTATION_MAX = 25;
+    var SURFACE_PAD = 20;
+
+    /* helpers */
+    function rand(min, max) {
+        return min + Math.random() * (max - min);
+    }
+
+    function randInt(min, max) {
+        return Math.floor(rand(min, max + 1));
+    }
+
+    function shuffle(arr) {
+        var copy = arr.slice();
+        for (var i = copy.length - 1; i > 0; i--) {
+            var j = randInt(0, i);
+            var tmp = copy[i];
+            copy[i] = copy[j];
+            copy[j] = tmp;
+        }
+        return copy;
+    }
+
+    /* build item list */
+    var allItems = [];
+
+    stamps.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'stamp' });
+    });
+    stickers.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'sticker' });
+    });
+    gifs.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'gif' });
+    });
+    buttons.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'button' });
+    });
+    blinkies.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'blinkie' });
+    });
+    userboxes.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'userbox' });
+    });
+    trinkets.forEach(function (item) {
+        allItems.push({ src: item.src, type: 'trinket' });
+    });
+
+    /* placement function — scatters items randomly across the surface */
+    function getItemSize(item) {
+        if (item.type === 'stamp')    return STAMP_SIZE;
+        if (item.type === 'sticker')  return randInt(STICKER_MIN, STICKER_MAX);
+        if (item.type === 'gif')      return randInt(GIF_MIN, GIF_MAX);
+        if (item.type === 'button')   return 88;
+        if (item.type === 'blinkie')  return 150;
+        if (item.type === 'userbox')  return 300;
+        if (item.type === 'trinket')  return randInt(120, 220);
+        return randInt(GIF_MIN, GIF_MAX);
+    }
+
+    function getItemClass(item) {
+        if (item.type === 'stamp')    return 'item-stamp';
+        if (item.type === 'sticker')  return 'item-sticker';
+        if (item.type === 'gif')      return 'item-gif';
+        if (item.type === 'button')   return 'item-button';
+        if (item.type === 'blinkie')  return 'item-blinkie';
+        if (item.type === 'userbox')  return 'item-userbox';
+        if (item.type === 'trinket')  return 'item-trinket';
+        return 'item-gif';
+    }
+
+    function placeItems() {
+        var surface = document.getElementById('stickerSurface');
+        if (!surface) return;
+        surface.innerHTML = '';
+
+        var viewW = window.innerWidth;
+        var viewH = window.innerHeight;
+
+        // Make the surface tall enough to scatter items vertically
+        var surfaceH = Math.max(viewH * 1.5, viewH + 400);
+        surface.style.minHeight = surfaceH + 'px';
+
+        var shuffled = shuffle(allItems);
+
+        for (var i = 0; i < shuffled.length; i++) {
+            var item = shuffled[i];
+            var size = getItemSize(item);
+            var cls = getItemClass(item);
+
+            // True random position across the full surface
+            var x = rand(SURFACE_PAD, viewW - size - SURFACE_PAD);
+            var y = rand(0, surfaceH - size);
+
+            var rotation = rand(-ROTATION_MAX, ROTATION_MAX);
+            var zIndex = randInt(1, allItems.length);
+
+            var img = document.createElement('img');
+            img.src = item.src;
+            img.alt = '';
+            img.draggable = false;
+            img.classList.add('collection-item', cls);
+
+            img.style.left   = x + 'px';
+            img.style.top    = y + 'px';
+            img.style.zIndex = zIndex;
+
+            if (item.type === 'stamp') {
+                img.style.width  = STAMP_SIZE + 'px';
+                img.style.height = STAMP_HEIGHT + 'px';
+            } else if (item.type === 'button') {
+                img.style.width  = '88px';
+                img.style.height = '31px';
+            } else if (item.type === 'blinkie') {
+                img.style.width  = '150px';
+                img.style.height = '20px';
+            } else if (item.type === 'userbox') {
+                img.style.width  = '300px';
+                img.style.height = 'auto';
+            } else if (item.type === 'trinket') {
+                img.style.width  = size + 'px';
+                img.style.height = 'auto';
+            } else {
+                img.style.width  = size + 'px';
+                img.style.height = 'auto';
+            }
+
+            var rotateStr = 'rotate(' + rotation.toFixed(1) + 'deg)';
+            img.style.setProperty('--base-rotation', rotateStr);
+            img.style.transform = rotateStr;
+
+            surface.appendChild(img);
+        }
+    }
+
+    // Initial placement
+    placeItems();
+
+    // Re-scatter on resize
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(placeItems, 300);
+    });
+
+})();
+</script>
+</body>
+</html>
