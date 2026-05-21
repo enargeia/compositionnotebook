@@ -1,4 +1,4 @@
-# collection — sticker bomb template
+sticker bomb template
 
 a composition notebook-style collection page for stamps, stickers, gifs, buttons, blinkies, userboxes, and trinkets. items are randomly placed in a grid with rotation and overlap, mimicking a sticker-bombed notebook cover.
 
